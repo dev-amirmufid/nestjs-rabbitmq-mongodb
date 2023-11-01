@@ -6,7 +6,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES2021",
+    "target": "es2017",
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
@@ -22,6 +22,7 @@
       "@app/shared/*": ["libs/shared/src/*"],
       "@auth": ["apps/auth/src"],
       "@auth/*": ["apps/auth/src/*"],
+      "@utils": ["utils"],
       "@utils/*": ["utils/*"]
     }
   }
