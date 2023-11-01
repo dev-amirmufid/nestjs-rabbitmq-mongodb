@@ -1,4 +1,4 @@
-import { Controller, BadGatewayException } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { AuthService } from '@auth/services';
 import {
   MessagePattern,
@@ -7,19 +7,20 @@ import {
   Payload,
 } from '@nestjs/microservices';
 import { RegisterDto } from '@auth/dto';
+import { SharedService } from '@app/shared';
 
 @Controller()
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly sharedService: SharedService,
+  ) {}
 
   @MessagePattern({ cmd: 'auth.login' })
-  async login(@Ctx() context: RmqContext) {
-    const channel = context.getChannelRef();
-    const message = context.getMessage();
+  async login(@Ctx() context: RmqContext, @Payload() payload) {
+    this.sharedService.acknowledgeMessage(context);
 
-    channel.ack(message);
-
-    return { login: 'login' };
+    return { login: 'login 3', payload };
   }
 
   @MessagePattern({ cmd: 'auth.register' })
@@ -27,13 +28,14 @@ export class AuthController {
     @Ctx() context: RmqContext,
     @Payload() registerDto: RegisterDto,
   ) {
-    const channel = context.getChannelRef();
-    const message = context.getMessage();
-    channel.ack(message);
+    this.sharedService.acknowledgeMessage(context);
+
     try {
-      return this.authService.register(registerDto);
+      await this.authService.register(registerDto);
+      return { register: 'register', registerDto };
     } catch (err) {
-      throw new BadGatewayException(err.message);
+      console.log(err);
+      return false;
     }
   }
 }

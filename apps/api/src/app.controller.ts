@@ -1,5 +1,4 @@
-import { RegisterDto } from '@auth/dto';
-import { Controller, Get, Post, Inject, Res, Body } from '@nestjs/common';
+import { Controller, Get, Post, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
 @Controller()
@@ -7,9 +6,11 @@ export class AppController {
   constructor(
     @Inject('AUTH_SERVICE')
     private authService: ClientProxy,
+    @Inject('PRESENCE_SERVICE')
+    private presenceService: ClientProxy,
   ) {}
 
-  @Get()
+  @Get('login')
   login() {
     console.log('auth-login 2');
     return this.authService.send(
@@ -20,13 +21,29 @@ export class AppController {
     );
   }
 
-  @Post('/register')
-  register(@Res() response, @Body() registerDto: RegisterDto) {
+  @Post('register')
+  register() {
     return this.authService.send(
       {
         cmd: 'auth.register',
       },
-      registerDto,
+      {
+        username: 'amirmufid',
+        email: 'amirmufid.forbid@gmail.com',
+        password: '1234',
+        confirm_password: '1234',
+      },
+    );
+  }
+
+  @Get('presence')
+  getPresence() {
+    console.log('getPresence');
+    return this.presenceService.send(
+      {
+        cmd: 'presence.get',
+      },
+      { userId: 123 },
     );
   }
 }
