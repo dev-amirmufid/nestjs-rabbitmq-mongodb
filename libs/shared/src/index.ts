@@ -1,4 +1,6 @@
-export * from './shared.module';
-export * from './shared.service';
-export * from './auth.guard';
-export * from './database.module';
+export * from './modules/shared.module';
+export * from './modules/database.module';
+
+export * from './services/shared.service';
+
+export * from './guards/auth.guard';

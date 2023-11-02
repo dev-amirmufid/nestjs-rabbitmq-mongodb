@@ -22,6 +22,8 @@
       "@app/shared/*": ["libs/shared/src/*"],
       "@auth": ["apps/auth/src"],
       "@auth/*": ["apps/auth/src/*"],
+      "@users": ["apps/users/src"],
+      "@users/*": ["apps/users/src/*"],
       "@utils": ["utils"],
       "@utils/*": ["utils/*"]
     }

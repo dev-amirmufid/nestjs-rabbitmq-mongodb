@@ -7,8 +7,8 @@ export class ApiController {
   constructor(
     @Inject('AUTH_SERVICE')
     private authService: ClientProxy,
-    @Inject('PRESENCE_SERVICE')
-    private presenceService: ClientProxy,
+    @Inject('USERS_SERVICE')
+    private usersService: ClientProxy,
   ) {}
 
   @Post('/login')
@@ -32,12 +32,12 @@ export class ApiController {
     );
   }
 
-  @Get('/presence')
-  getPresence() {
-    console.log('getPresence');
-    return this.presenceService.send(
+  @Get('/users')
+  getUsers() {
+    console.log('getUsers');
+    return this.usersService.send(
       {
-        cmd: 'presence.get',
+        cmd: 'users.get',
       },
       { userId: 123 },
     );

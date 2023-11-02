@@ -1,5 +1,5 @@
 import * as moment from 'moment';
-import { HOROSCOPE, ZODIACS } from '@Constans/zodiac.constant';
+import { HOROSCOPE, ZODIACS } from '@users/constants/zodiac.constant';
 
 export const getZodiac = (date: string): string => {
   const birthdate = moment(date, 'YYYY-MM-DD');

@@ -1,3 +1,1 @@
-import { AuthEntity } from './auth.entity';
-
-export { AuthEntity };
+export * from './auth.entity';

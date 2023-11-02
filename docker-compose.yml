@@ -3,6 +3,7 @@ version: '3'
 volumes:
   mongo-data-store:
   redis-data-store:
+  app-node_modules:
 
 services:
   rabbitmq:
@@ -15,6 +16,11 @@ services:
       - '15672:15672'
     env_file:
       - .env
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
 
   mongodb:
     container_name: mongodb
@@ -25,6 +31,12 @@ services:
       - mongo-data-store:/data/db
     env_file:
       - .env
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo ${MONGO_DB_USERNAME}:${MONGO_DB_PASSWORD}@${MONGO_DB_HOST}:${MONGO_DB_PORT}/${MONGO_DB_NAME} --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
 
   redis:
     container_name: redis
@@ -36,6 +48,8 @@ services:
       - 6379:6379
     volumes:
       - redis-data-store:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
 
   auth:
     container_name: auth-services
@@ -45,27 +59,31 @@ services:
     env_file:
       - .env
     depends_on:
-      - rabbitmq
-      - mongodb
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
     volumes:
       - ./:/home/node/app
-      - /home/node/app/node_modules
+      - app-node_modules:/home/node/app/node_modules
     command: npm run start:dev auth
 
-  presence:
-    container_name: presence-services
+  users:
+    container_name: users-services
     build:
       context: ./
-      dockerfile: ./apps/presence/Dockerfile
+      dockerfile: ./apps/users/Dockerfile
     env_file:
       - .env
     depends_on:
-      - rabbitmq
-      - mongodb
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
     volumes:
       - ./:/home/node/app
-      - /home/node/app/node_modules
-    command: npm run start:dev presence
+      - app-node_modules:/home/node/app/node_modules
+    command: npm run start:dev users
 
   api:
     container_name: api-gateway
@@ -74,14 +92,12 @@ services:
       dockerfile: ./apps/api/Dockerfile
     volumes:
       - ./:/home/node/app
-      - /home/node/app/node_modules
+      - app-node_modules:/home/node/app/node_modules
     command: npm run start:dev api
     depends_on:
-      - rabbitmq
-      - mongodb
-      - auth
-      - presence
+      auth:
+      users:
     env_file:
       - .env
     ports:
-      - '1001:1000'
+      - '1000:1000'

@@ -1,4 +1,2 @@
-import { LoginDto } from './login.dto';
-import { RegisterDto } from './register.dto';
-
-export { LoginDto, RegisterDto };
+export * from './login.dto';
+export * from './register.dto';

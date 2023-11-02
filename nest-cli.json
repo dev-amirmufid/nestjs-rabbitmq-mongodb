@@ -36,13 +36,13 @@
         "tsConfigPath": "libs/shared/tsconfig.lib.json"
       }
     },
-    "presence": {
+    "users": {
       "type": "application",
-      "root": "apps/presence",
+      "root": "apps/users",
       "entryFile": "main",
-      "sourceRoot": "apps/presence/src",
+      "sourceRoot": "apps/users/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/presence/tsconfig.app.json"
+        "tsConfigPath": "apps/users/tsconfig.app.json"
       }
     }
   }

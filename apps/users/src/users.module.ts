@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { PresenceController } from './presence.controller';
-import { PresenceService } from './presence.service';
+import { UsersController } from './controllers/users.controller';
+import { UsersService } from './services/users.service';
 import { ConfigModule } from '@nestjs/config';
 import { SharedModule } from '@app/shared';
 
@@ -12,7 +12,7 @@ import { SharedModule } from '@app/shared';
     }),
     SharedModule,
   ],
-  controllers: [PresenceController],
-  providers: [PresenceService],
+  controllers: [UsersController],
+  providers: [UsersService],
 })
-export class PresenceModule {}
+export class UsersModule {}
