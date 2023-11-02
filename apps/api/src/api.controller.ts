@@ -1,6 +1,17 @@
-import { Controller, Get, Post, Inject, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Inject,
+  Body,
+  UseGuards,
+  Req,
+  Put,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { LoginDto, RegisterDto } from '@auth/dtos';
+import { CreateUserDto, UpdateUserDto } from '@users/dtos';
+import { AuthGuard } from '@app/shared';
 
 @Controller()
 export class ApiController {
@@ -12,7 +23,7 @@ export class ApiController {
   ) {}
 
   @Post('/login')
-  login(@Body() loginDto: LoginDto) {
+  async login(@Body() loginDto: LoginDto) {
     console.log(loginDto, 'loginDto');
     return this.authService.send(
       {
@@ -23,7 +34,7 @@ export class ApiController {
   }
 
   @Post('/register')
-  register(@Body() registerDto: RegisterDto) {
+  async register(@Body() registerDto: RegisterDto) {
     return this.authService.send(
       {
         cmd: 'auth.register',
@@ -32,14 +43,36 @@ export class ApiController {
     );
   }
 
-  @Get('/users')
-  getUsers() {
-    console.log('getUsers');
+  @UseGuards(AuthGuard)
+  @Get('/getProfile')
+  async getProfile(@Req() request) {
     return this.usersService.send(
       {
-        cmd: 'users.get',
+        cmd: 'users.getProfile',
       },
-      { userId: 123 },
+      { auth: request.auth },
+    );
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/createProfile')
+  async createProfile(@Req() request, @Body() createUserDto: CreateUserDto) {
+    return this.usersService.send(
+      {
+        cmd: 'users.createProfile',
+      },
+      { auth: request.auth, data: createUserDto },
+    );
+  }
+
+  @UseGuards(AuthGuard)
+  @Put('/updateProfile')
+  async updateProfile(@Req() request, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.send(
+      {
+        cmd: 'users.updateProfile',
+      },
+      { auth: request.auth, data: updateUserDto },
     );
   }
 }

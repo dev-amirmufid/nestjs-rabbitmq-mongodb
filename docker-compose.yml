@@ -1,6 +1,7 @@
 version: '3'
 
 volumes:
+  rabbitmq-data-store:
   mongo-data-store:
   redis-data-store:
   app-node_modules:
@@ -10,7 +11,7 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     volumes:
-      - /var/lib/rabbitmq
+      - rabbitmq-data-store:/var/lib/rabbitmq
     ports:
       - '5672:5672'
       - '15672:15672'
@@ -32,7 +33,7 @@ services:
     env_file:
       - .env
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongo ${MONGO_DB_USERNAME}:${MONGO_DB_PASSWORD}@${MONGO_DB_HOST}:${MONGO_DB_PORT}/${MONGO_DB_NAME} --quiet
+      test: echo 'db.runCommand("ping").ok'
       interval: 10s
       timeout: 10s
       retries: 5
@@ -49,7 +50,7 @@ services:
     volumes:
       - redis-data-store:/data
     healthcheck:
-      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
+      test: ['CMD', 'redis-server --requirepass $$REDIS_PASS', 'PING']
 
   auth:
     container_name: auth-services
@@ -95,8 +96,8 @@ services:
       - app-node_modules:/home/node/app/node_modules
     command: npm run start:dev api
     depends_on:
-      auth:
-      users:
+      - auth
+      - users
     env_file:
       - .env
     ports:

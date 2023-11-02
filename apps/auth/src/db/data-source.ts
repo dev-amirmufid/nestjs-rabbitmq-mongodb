@@ -1,4 +1,5 @@
 import { AuthEntity } from '@auth/entities';
+import { UsersEntity } from '@users/entities';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
 export const dataSourceOptions: DataSourceOptions = {
@@ -9,7 +10,7 @@ export const dataSourceOptions: DataSourceOptions = {
   password: process.env.MONGO_DB_PASSWORD,
   database: process.env.MONGO_DB_NAME,
   authSource: 'admin',
-  entities: [AuthEntity],
+  entities: [AuthEntity, UsersEntity],
   synchronize: true,
 };
 

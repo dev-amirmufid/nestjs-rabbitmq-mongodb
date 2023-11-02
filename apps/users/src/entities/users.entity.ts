@@ -12,7 +12,7 @@ export class UsersEntity {
   @ObjectIdColumn()
   id: ObjectId;
   @Column()
-  accountId: string;
+  authId: string;
   @Column()
   name: string;
   @Column()

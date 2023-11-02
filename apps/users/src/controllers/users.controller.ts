@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, BadGatewayException } from '@nestjs/common';
 import {
   Ctx,
   MessagePattern,
@@ -20,48 +20,40 @@ export class UsersController {
   @MessagePattern({ cmd: 'users.getProfile' })
   async getProfile(@Ctx() context: RmqContext, @Payload() payload) {
     this.sharedService.acknowledgeMessage(context);
-    const user = payload.user;
-    try {
-      const userData = await this.usersService.getUser(user.sub);
+    const auth = payload.auth;
+    const userData = await this.usersService.getUser(auth.sub);
 
-      const age = getAge(userData.birthday);
+    const age = getAge(userData.birthday);
 
-      return {
-        zodiac: getZodiac(userData.birthday),
-        hosorsope: getHoroscope(userData.birthday),
-        age: age,
-        ...userData,
-      };
-    } catch (err) {
-      console.log(err);
-      return false;
-    }
+    return {
+      zodiac: getZodiac(userData.birthday),
+      hosorsope: getHoroscope(userData.birthday),
+      age: age,
+      ...userData,
+    };
   }
 
   @MessagePattern({ cmd: 'users.createProfile' })
-  async createProfile(
-    @Ctx() context: RmqContext,
-    @Payload() createUserDto: CreateUserDto,
-  ) {
+  async createProfile(@Ctx() context: RmqContext, @Payload() payload) {
+    this.sharedService.acknowledgeMessage(context);
+    const auth = payload.auth;
+    const data: CreateUserDto = payload.data;
     try {
-      return await this.usersService.createUser('asdasdasd', createUserDto);
+      return await this.usersService.createUser(auth.sub, data);
     } catch (err) {
-      console.log(err);
-      return false;
+      throw new BadGatewayException(err);
     }
   }
 
   @MessagePattern({ cmd: 'users.updateProfile' })
-  async updateProfile(
-    @Ctx() context: RmqContext,
-    @Payload() updateUserDto: UpdateUserDto,
-  ) {
+  async updateProfile(@Ctx() context: RmqContext, @Payload() payload) {
     this.sharedService.acknowledgeMessage(context);
+    const auth = payload.auth;
+    const data: UpdateUserDto = payload.data;
     try {
-      return await this.usersService.updateUser('asdasd', updateUserDto);
+      return await this.usersService.updateUser(auth.sub, data);
     } catch (err) {
-      console.log(err);
-      return false;
+      throw new BadGatewayException(err);
     }
   }
 }
