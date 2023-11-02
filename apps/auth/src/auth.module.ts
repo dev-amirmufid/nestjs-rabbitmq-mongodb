@@ -7,8 +7,7 @@ import { IsUniqueConstraint } from '@utils/unique.validator';
 import { DataSource } from 'typeorm';
 import { AuthEntity } from '@auth/entities';
 import { JwtModule } from '@nestjs/jwt';
-import { DatabaseModule } from '@app/shared/database.module';
-import { SharedModule } from '@app/shared';
+import { SharedModule, DatabaseModule } from '@app/shared';
 
 @Module({
   imports: [

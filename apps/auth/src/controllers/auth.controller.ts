@@ -6,7 +6,7 @@ import {
   Ctx,
   Payload,
 } from '@nestjs/microservices';
-import { RegisterDto } from '@auth/dto';
+import { LoginDto, RegisterDto } from '@auth/dtos';
 import { SharedService } from '@app/shared';
 
 @Controller()
@@ -17,10 +17,15 @@ export class AuthController {
   ) {}
 
   @MessagePattern({ cmd: 'auth.login' })
-  async login(@Ctx() context: RmqContext, @Payload() payload) {
+  async login(@Ctx() context: RmqContext, @Payload() loginDto: LoginDto) {
     this.sharedService.acknowledgeMessage(context);
 
-    return { login: 'login 3', payload };
+    try {
+      return await this.authService.login(loginDto);
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
   }
 
   @MessagePattern({ cmd: 'auth.register' })
@@ -31,8 +36,7 @@ export class AuthController {
     this.sharedService.acknowledgeMessage(context);
 
     try {
-      await this.authService.register(registerDto);
-      return { register: 'register', registerDto };
+      return await this.authService.register(registerDto);
     } catch (err) {
       console.log(err);
       return false;
